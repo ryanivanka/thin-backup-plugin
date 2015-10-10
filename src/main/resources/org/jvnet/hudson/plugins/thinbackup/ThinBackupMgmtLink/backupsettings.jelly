@@ -116,6 +116,12 @@
                         help="/plugin/thinBackup/help/help-moveOldBackupsToZipFile.html"
                         checked="${it.configuration.moveOldBackupsToZipFile}"
                         name="moveOldBackupsToZipFile" />
+
+                     <f:optionalBlock title="Backup credential files"
+                        help="/plugin/thinBackup/help/help-backupCredentialFiles.html"
+                        checked="${it.configuration.backupCredentialFiles}"
+                        name="backupCredentialFiles">
+                     </f:optionalBlock>
                 </f:section>
                 
                 <f:section>

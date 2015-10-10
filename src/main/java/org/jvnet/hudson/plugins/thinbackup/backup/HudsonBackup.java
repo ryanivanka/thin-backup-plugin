@@ -25,6 +25,7 @@ import hudson.model.Run;
 import hudson.util.RunList;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -72,6 +73,8 @@ public class HudsonBackup {
   public static final String CHANGELOG_HISTORY_PLUGIN_DIR_NAME = "changelog-history";
   public static final String SVN_CREDENTIALS_FILE_NAME = "subversion.credentials";
   public static final String SVN_EXTERNALS_FILE_NAME = "svnexternals.txt";
+  public static final String CREDENTIAL_DIR_NAME = "secrets";
+  public static final Pattern CREDENTIAL_SECRET_FILE_REGX = Pattern.compile(".*\\.key.*", Pattern.CASE_INSENSITIVE);
 
   private final ThinBackupPluginImpl plugin;
   private final File hudsonHome;
@@ -169,6 +172,9 @@ public class HudsonBackup {
     if (plugin.isBackupAdditionalFiles())
         backupAdditionalFiles();
 
+    if (plugin.isBackupCredentialFiles())
+        backupCredentialFiles();
+
     (new DirectoryCleaner()).removeEmptyDirectories(backupDirectory);
 
     if (backupType == BackupType.FULL) {
@@ -176,6 +182,18 @@ public class HudsonBackup {
       moveOldBackupsToZipFile(backupDirectory);
       removeSuperfluousBackupSets();
     }
+  }
+
+  private void backupCredentialFiles() throws IOException {
+    LOGGER.fine("Backing up credential configuration files...");
+    backupRootFolder(CREDENTIAL_DIR_NAME);
+
+    IOFileFilter secretFileFilter = FileFilterUtils.and(
+            FileFileFilter.FILE, new RegexFileFilter(CREDENTIAL_SECRET_FILE_REGX));
+
+    FileUtils.copyDirectory(hudsonHome, backupDirectory, secretFileFilter);
+
+    LOGGER.fine("DONE backing up credentials specific configuration files.");
   }
 
   private void backupGlobalXmls() throws IOException {
@@ -263,8 +281,6 @@ public class HudsonBackup {
 
   private void backupAdditionalFiles() throws IOException {
     LOGGER.info("Backing up additional files...");
-
-    
     
     if (backupAdditionalFilesRegexPattern != null) {
     	final IOFileFilter addFilesFilter = new RegexFileFilter(backupAdditionalFilesRegexPattern);
@@ -273,7 +289,7 @@ public class HudsonBackup {
                 addFilesFilter,
                 FileFilterUtils.or(
                   DirectoryFileFilter.DIRECTORY,
-                  FileFilterUtils.and(
+                        FileFilterUtils.and(
                     getFileAgeDiffFilter(),
                     getExcludedFilesFilter())));
 

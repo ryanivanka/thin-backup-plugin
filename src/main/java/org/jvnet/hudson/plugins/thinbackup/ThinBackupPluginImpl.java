@@ -56,6 +56,7 @@ public class ThinBackupPluginImpl extends Plugin {
   private boolean backupPluginArchives = false;
   private boolean backupUserContents = false;
   private boolean backupAdditionalFiles = false;
+  private boolean backupCredentialFiles = true;
   private String backupAdditionalFilesRegex = null;
   private boolean backupNextBuildNumber = false;
   private boolean backupBuildsToKeepOnly = false;
@@ -235,6 +236,14 @@ public class ThinBackupPluginImpl extends Plugin {
 	  
   public void setBackupAdditionalFiles(final boolean backupAdditionalFiles) {
     this.backupAdditionalFiles = backupAdditionalFiles;
+  }
+
+  public boolean isBackupCredentialFiles() {
+    return backupCredentialFiles;
+  }
+
+  public void setBackupCredentialFiles(final boolean backupCredentialFiles){
+    this.backupCredentialFiles = backupCredentialFiles;
   }
 
   public boolean isBackupAdditionalFiles() {
